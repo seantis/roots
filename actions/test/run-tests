@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GITHUB_WORKSPACE="${GITHUB_WORKSPACE:-/github/workspace}"
+
+if ! test -d "$GITHUB_WORKSPACE"; then
+    echo "$GITHUB_WORKSPACE is missing"
+    exit 1
+fi
+
+cd "$GITHUB_WORKSPACE" || exit 1
+
+echo "🌲 Downloading dependencies"
+go mod download
+echo ""
+
+echo "🌲 Running unit tests"
+go test pkg/image/*
+echo ""
+
+echo "🌲 Testing Docker Hub pull with race detection"
+go run -race roots.go pull ubuntu /tmp/ubuntu
+echo ""
+
+echo "🌲 Testing GCR pull"
+go run roots.go pull gcr.io/google-containers/etcd:3.3.10 /tmp/etcd
+echo ""

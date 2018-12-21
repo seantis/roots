@@ -70,3 +70,19 @@ That only leaves the digest operation, which doesn't write anything as well as
 the option to use no cache or separate caches with differing destinations.
 
 Feel free to open an issue if you have a use case for this.
+
+## Tests
+
+Unit tests can be run as follows:
+
+```bash
+go test pkg/image/*
+```
+
+Additional tests are run using GitHub actions. To try those locally, run the
+following commands with docker:
+
+```bash
+docker build -t roots-test actions/test
+docker run -v $(pwd):/github/workspace --rm -it roots-test run-tests
+```
