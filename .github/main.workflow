@@ -1,6 +1,6 @@
-workflow "Run Tests" {
+workflow "Run Tests and Release if Tagged" {
   on = "push"
-  resolves = "Test"
+  resolves = "Release"
 }
 
 action "Test" {
@@ -8,13 +8,14 @@ action "Test" {
   runs = "run-tests"
 }
 
-workflow "Run Release" {
-  on = "push"
-  resolves = "Release"
+action "Tagged" {
+  needs = "Test"
+  uses = "actions/bin/filter@master"
+  args = "tag v*"
 }
 
 action "Release" {
-  needs = "Test"
+  needs = "Tagged"
   uses = "seantis/roots/actions/release@master"
   runs = "run-release"
   secrets = ["GITHUB_TOKEN"]
