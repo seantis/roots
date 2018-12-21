@@ -86,3 +86,21 @@ following commands with docker:
 docker build -t roots-test actions/test
 docker run -v $(pwd):/github/workspace --rm -it roots-test run-tests
 ```
+
+## Releases
+
+There's a release process defined with GitHub Actions, but it is currently
+defunct as public repositories do not get properly triggered when tagging
+a commit.
+
+Therefore, this is the current manual release process:
+
+```bash
+git tag -d vX.Y.Z
+git push --follow-tags
+
+GITHIUB_TOKEN="foobar" goreleaser --rm-dist
+```
+
+In the future the last step should happen automatically if the tests pass, with
+the only requirement being a tagged commit.
