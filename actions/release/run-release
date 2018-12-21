@@ -31,4 +31,4 @@ dpkg -i goreleaser.deb
 
 echo "🌲 Releasing $VERSION"
 cd "$GITHUB_WORKSPACE" || exit 1
-goreleaser
+goreleaser --release-notes CHANGES.md
