@@ -99,7 +99,7 @@ a commit.
 Therefore, this is the current manual release process:
 
 ```bash
-git tag -d vX.Y.Z
+git tag vX.Y.Z
 git push --follow-tags
 
 GITHIUB_TOKEN="foobar" make release
