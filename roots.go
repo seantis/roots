@@ -142,7 +142,7 @@ func main() {
 
 				// let's not be responsible for wiping out an actual root fs
 				if strings.Count(*dest, "/") <= 2 {
-					log.Fatalf("not enough path separates to force-remove: %s", *dest)
+					log.Fatalf("not enough path separators to force-remove: %s", *dest)
 				}
 
 				if err := os.RemoveAll(*dest); err != nil {
