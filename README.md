@@ -76,15 +76,14 @@ Feel free to open an issue if you have a use case for this.
 Unit tests can be run as follows:
 
 ```bash
-go test pkg/image/*
+make test
 ```
 
 Additional tests are run using GitHub actions. To try those locally, run the
-following commands with docker:
+following command (requires docker):
 
 ```bash
-docker build -t roots-test actions/test
-docker run -v $(pwd):/github/workspace --rm -it roots-test run-tests
+make test-all
 ```
 
 ## Releases
@@ -99,8 +98,23 @@ Therefore, this is the current manual release process:
 git tag -d vX.Y.Z
 git push --follow-tags
 
-GITHIUB_TOKEN="foobar" goreleaser --rm-dist
+GITHIUB_TOKEN="foobar" make release
 ```
 
-In the future the last step should happen automatically if the tests pass, with
+In the future this step should happen automatically if the tests pass, with
 the only requirement being a tagged commit.
+
+Note also that currently only linux/amd64 is offered as a prebuilt binary. Due
+to our use of the os/user.Current we need to use CGO, which makes cross compilation
+a bit tricky. Other platforms are currently required to install this tool
+using the default `go get github.com/seantis/roots` approach.
+
+## Test-Releases
+
+You can create a test release using:
+
+```bash
+make test-release
+```
+
+Test releases have the version 0.0.0.
