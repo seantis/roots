@@ -2,10 +2,14 @@
 
 Pulls containers from registries and extracts them into a folder. The resulting
 root tree can be used to inspect all the files of a container and it can be run
-directly using [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html):
+directly using [systemd-nspawn](https://www.freedesktop.org/software/systemd/man/systemd-nspawn.html).
 
 There are other tools that can accomplish the same thing, but they all do
 more than roots does. Roots fetches image layers, extracts them and calls it a day.
+
+## Introduction
+
+Pull a container, extract it and run it using systemd-nspawn:
 
 ```bash
 roots pull ubuntu:18.04 ./ubuntu
