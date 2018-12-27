@@ -3,7 +3,7 @@ test:
 	go test ./...
 
 .PHONY: test-all
-test-action:
+test-all:
 	docker build -t roots-test-action actions/test
 	docker run -v $(PWD):/github/workspace --rm -it roots-test-action run-tests
 
