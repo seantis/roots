@@ -102,7 +102,7 @@ Therefore, this is the current manual release process:
 git tag vX.Y.Z
 git push --follow-tags
 
-GITHUB_TOKEN="foobar" make release
+GITHUB_TOKEN="foobar" VERSION=vX.Y.Z make release
 ```
 
 In the future this step should happen automatically if the tests pass, with
