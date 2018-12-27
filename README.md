@@ -100,7 +100,7 @@ Therefore, this is the current manual release process:
 
 ```bash
 git tag vX.Y.Z
-git push --follow-tags
+git push --tags
 
 GITHUB_TOKEN="foobar" VERSION=vX.Y.Z make release
 ```
