@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/dankinder/httpmock"
-	"github.com/seantis/roots/pkg/image"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -16,11 +15,11 @@ type mockProvider struct {
 	Server *httpmock.Server
 }
 
-func (p *mockProvider) GetClient(url image.URL, auth string) (*http.Client, error) {
+func (p *mockProvider) GetClient(url URL, auth string) (*http.Client, error) {
 	return http.DefaultClient, nil
 }
 
-func (p *mockProvider) Supports(url image.URL) bool {
+func (p *mockProvider) Supports(url URL) bool {
 	return true
 }
 
@@ -29,7 +28,7 @@ func mockServer() *httpmock.Server {
 
 	header := make(http.Header)
 	header.Add("Docker-Content-Digest", "foobar")
-	header.Add("Content-Type", image.ManifestListMimeType)
+	header.Add("Content-Type", ManifestListMimeType)
 
 	downstream.On("Handle", "HEAD", "/v2/library/ubuntu/manifests/latest", mock.Anything).Return(httpmock.Response{
 		Header: header,
@@ -61,29 +60,29 @@ func mockServer() *httpmock.Server {
 
 // TestRemoteDigest tests the lookup of the digest on a mock provider
 func TestRemoteDigest(t *testing.T) {
-	defer image.ClearProviderRegistry()
+	defer ClearProviderRegistry()
 
 	server := mockServer()
 	defer server.Close()
 
-	image.RegisterProvider("mock", &mockProvider{
+	RegisterProvider("mock", &mockProvider{
 		Server: server,
 	})
 
-	url := image.URL{
+	url := URL{
 		Host:       server.URL(),
 		Name:       "ubuntu",
 		Repository: "library",
 		Tag:        "latest",
 	}
 
-	remote, _ := image.NewRemote(context.Background(), url, "")
+	remote, _ := NewRemote(context.Background(), url, "")
 
 	digest, err := remote.Digest()
 	assert.NoError(t, err, "error during mock lookup")
 	assert.Equal(t, "foobar", digest, "could not lookup mock digest")
 
-	remote.WithPlatform(&image.Platform{
+	remote.WithPlatform(&Platform{
 		Architecture: "arm",
 		OS:           "linux",
 	})

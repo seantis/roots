@@ -15,7 +15,7 @@ go mod download
 echo ""
 
 echo "🌲 Running unit tests"
-go test pkg/image/*
+go test ./...
 echo ""
 
 echo "🌲 Testing Docker Hub pull with race detection"

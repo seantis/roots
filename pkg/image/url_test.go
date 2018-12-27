@@ -4,17 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/seantis/roots/pkg/image"
 	"github.com/stretchr/testify/assert"
 )
 
 var cases = []struct {
 	url      string
-	expected image.URL
+	expected URL
 	format   string
 }{
 	{
-		"ubuntu", image.URL{
+		"ubuntu", URL{
 			Name:       "ubuntu",
 			Tag:        "latest",
 			Repository: "library",
@@ -23,7 +22,7 @@ var cases = []struct {
 		"registry-1.docker.io/library/ubuntu:latest",
 	},
 	{
-		"ubuntu:18.04", image.URL{
+		"ubuntu:18.04", URL{
 			Name:       "ubuntu",
 			Tag:        "18.04",
 			Repository: "library",
@@ -32,7 +31,7 @@ var cases = []struct {
 		"registry-1.docker.io/library/ubuntu:18.04",
 	},
 	{
-		"gcr.io/google-containers/ubuntu", image.URL{
+		"gcr.io/google-containers/ubuntu", URL{
 			Name:       "ubuntu",
 			Tag:        "latest",
 			Repository: "google-containers",
@@ -41,7 +40,7 @@ var cases = []struct {
 		"gcr.io/google-containers/ubuntu:latest",
 	},
 	{
-		"foo/bar", image.URL{
+		"foo/bar", URL{
 			Name:       "bar",
 			Tag:        "latest",
 			Repository: "foo",
@@ -50,7 +49,7 @@ var cases = []struct {
 		"registry-1.docker.io/foo/bar:latest",
 	},
 	{
-		"foo/bar@sha256:0xdeadbeef", image.URL{
+		"foo/bar@sha256:0xdeadbeef", URL{
 			Name:       "bar",
 			Tag:        "latest",
 			Repository: "foo",
@@ -60,16 +59,16 @@ var cases = []struct {
 		"registry-1.docker.io/foo/bar:latest@sha256:0xdeadbeef",
 	},
 	{
-		"", image.URL{}, "<empty>",
+		"", URL{}, "<empty>",
 	},
 	{
-		"@", image.URL{}, "<empty>",
+		"@", URL{}, "<empty>",
 	},
 	{
-		"/////@@", image.URL{}, "<empty>",
+		"/////@@", URL{}, "<empty>",
 	},
 	{
-		"    ", image.URL{}, "<empty>",
+		"    ", URL{}, "<empty>",
 	},
 }
 
@@ -77,7 +76,7 @@ var cases = []struct {
 func TestParse(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.url, func(t *testing.T) {
-			result, _ := image.Parse(c.url)
+			result, _ := Parse(c.url)
 
 			assert.Equal(t, c.expected, *result, "unexpected url")
 

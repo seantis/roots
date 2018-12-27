@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/seantis/roots/pkg/image"
 	"github.com/stretchr/testify/assert"
 )
 
 type nullProvider struct{}
 
-func (p *nullProvider) GetClient(url image.URL, auth string) (*http.Client, error) {
+func (p *nullProvider) GetClient(url URL, auth string) (*http.Client, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -19,7 +18,7 @@ type falseProvider struct {
 	*nullProvider
 }
 
-func (p *nullProvider) Supports(url image.URL) bool {
+func (p *nullProvider) Supports(url URL) bool {
 	return false
 }
 
@@ -27,23 +26,23 @@ type trueProvider struct {
 	*nullProvider
 }
 
-func (p *trueProvider) Supports(url image.URL) bool {
+func (p *trueProvider) Supports(url URL) bool {
 	return true
 }
 
 // TestRegistryLookup tests the registry lookup priority
 func TestRegistryLookup(t *testing.T) {
-	defer image.ClearProviderRegistry()
+	defer ClearProviderRegistry()
 
 	foo := &falseProvider{}
 	bar := &trueProvider{}
 	baz := &falseProvider{}
 
-	image.RegisterProvider("foo", foo)
-	image.RegisterProvider("bar", bar)
-	image.RegisterProvider("baz", baz)
+	RegisterProvider("foo", foo)
+	RegisterProvider("bar", bar)
+	RegisterProvider("baz", baz)
 
-	provider, _ := image.LookupProvider(image.URL{})
+	provider, _ := LookupProvider(URL{})
 
 	assert.Equal(t, provider, bar, "provider registry lookup failure")
 }
