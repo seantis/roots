@@ -66,7 +66,7 @@ go get github.com/seantis/roots
 It is possible to run multiple roots processes at the same time, however its
 use is quite limited as cache and destination are locked during pull/purge.
 
-That only leaves the digest operation, which doesn't write anything as well as
+That only leaves the digest operation, which doesn't write anything, as well as
 the option to use no cache or separate caches with differing destinations.
 
 Feel free to open an issue if you have a use case for this.
