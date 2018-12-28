@@ -66,9 +66,11 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 	r.Seek(0, 0)
 	gzr.Reset(r)
 
-	extract.Tar(ctx, gzr, dst, func(name string) string {
+	err = extract.Tar(ctx, gzr, dst, func(name string) string {
+
+		// skip whiteout files
 		if isWhiteoutPath(name) {
-			return "" // file will be skipped
+			return ""
 		}
 
 		return name
