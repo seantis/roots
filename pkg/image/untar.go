@@ -10,14 +10,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/codeclysm/extract"
 )
 
-// walkCondition returns true if the given tar entry should be included
-// when walking the tar file
-type walkCondition func(*tar.Header) bool
+// detect relative paths that try to escape the destination directory
+var unsafepath = regexp.MustCompile(`/?\.\./`)
 
 // walkHandler takes a tar.Header and handles it, returning an optional error
 type walkHandler func(*tar.Header, *tar.Reader) error
@@ -40,9 +40,22 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 		return err
 	}
 
-	// first get all the whiteouts and apply them to the destination
-	err = walkTar(ctx, gzr, isWhiteout, func(h *tar.Header, r *tar.Reader) error {
-		return applyWhiteout(dst, h.Name)
+	// pre-process the archive
+	err = walkTar(ctx, gzr, func(h *tar.Header, r *tar.Reader) error {
+
+		// apply whiteout files
+		if isWhiteoutPath(h.Name) {
+			if err := applyWhiteout(dst, h.Name); err != nil {
+				return err
+			}
+		}
+
+		// detect unsafe filenames and stop everything if found
+		if unsafepath.MatchString(h.Name) {
+			return fmt.Errorf("refusing to extract unsafe path: %s", h.Name)
+		}
+
+		return nil
 	})
 
 	if err != nil {
@@ -68,9 +81,8 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 	return nil
 }
 
-// walkTar takes a gzip.Reader and calls a handler function depending on the
-// return value of a
-func walkTar(ctx context.Context, gzr *gzip.Reader, condition walkCondition, handler walkHandler) error {
+// walkTar takes a gzip.Reader and calls a handler function
+func walkTar(ctx context.Context, gzr *gzip.Reader, handler walkHandler) error {
 	tr := tar.NewReader(gzr)
 
 	for {
@@ -87,12 +99,10 @@ func walkTar(ctx context.Context, gzr *gzip.Reader, condition walkCondition, han
 		case <-ctx.Done():
 			return errors.New("interrupted")
 		default:
-			if condition(header) {
-				err = handler(header, tr)
+			err = handler(header, tr)
 
-				if err != nil {
-					return err
-				}
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -162,10 +172,6 @@ func applySimpleWhiteout(dst, whiteout string) error {
 	}
 
 	return os.Remove(file)
-}
-
-func isWhiteout(h *tar.Header) bool {
-	return isWhiteoutPath(h.Name)
 }
 
 func isWhiteoutPath(p string) bool {
