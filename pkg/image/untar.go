@@ -54,7 +54,7 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 	gzr.Reset(r)
 
 	extract.Tar(ctx, gzr, dst, func(name string) string {
-		if hasWhiteoutPrefix(name) {
+		if isWhiteoutPath(name) {
 			return "" // file will be skipped
 		}
 
@@ -98,7 +98,7 @@ func walkTar(ctx context.Context, gzr *gzip.Reader, condition walkCondition, han
 	}
 }
 
-// applyWhiteout takes a destnation and a relative whiteout path and applies it
+// applyWhiteout takes a destination and a relative whiteout path and applies it
 func applyWhiteout(dst, whiteout string) error {
 	if strings.HasSuffix(whiteout, ".wh..wh..opq") {
 		return applyOpaqueWhiteout(dst, whiteout)
@@ -165,9 +165,9 @@ func applySimpleWhiteout(dst, whiteout string) error {
 }
 
 func isWhiteout(h *tar.Header) bool {
-	return hasWhiteoutPrefix(filepath.Base(h.Name))
+	return isWhiteoutPath(h.Name)
 }
 
-func hasWhiteoutPrefix(name string) bool {
-	return strings.HasPrefix(name, ".wh.")
+func isWhiteoutPath(p string) bool {
+	return strings.HasPrefix(filepath.Base(p), ".wh.")
 }
