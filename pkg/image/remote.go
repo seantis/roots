@@ -107,6 +107,9 @@ func (r *Remote) Manifest() (*Manifest, error) {
 
 	// the digest is bound to the platform
 	digest, err := r.Digest()
+	if err != nil {
+		return nil, err
+	}
 
 	// it should almost certainly be fetchable at this point
 	res, err := r.request("GET", ManifestMimeType, "manifests", digest)
