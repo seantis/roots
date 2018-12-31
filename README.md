@@ -53,7 +53,7 @@ roots pull gcr.io/google-containers/etcd:3.3.10 --arch arm --os linux
 
 If the image does not support multiple platforms, using --arch/--os will result
 in an error. If the image does support multiple platforms and --arch/--os is
-ommitted, the default manifest defined by the registry is used.
+omitted, the default manifest defined by the registry is used.
 
 ## Requirements / Limitations
 
@@ -61,7 +61,7 @@ Roots has only been tested on Linux/MacOS.
 
 ## Installation
 
-To install the roots commandline run the following command:
+To install the roots command-line run the following command:
 
 ```bash
 go get github.com/seantis/roots
