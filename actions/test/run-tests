@@ -12,11 +12,18 @@ cd "$GITHUB_WORKSPACE" || exit 1
 
 echo "🌲 Downloading dependencies"
 go mod download
-echo ""
+
+# install go get outside our repository to ignore the mod file
+pushd /
+go get github.com/golangci/golangci-lint/cmd/golangci-lint
+popd
 
 echo "🌲 Running unit tests"
 go test ./...
 echo ""
+
+echo "🌲 Running golangci-lint"
+golangci-lint run
 
 echo "🌲 Testing Docker Hub pull with race detection"
 go run -race roots.go pull ubuntu /tmp/ubuntu
