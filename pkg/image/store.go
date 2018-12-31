@@ -174,6 +174,8 @@ func (s *Store) Extract(ctx context.Context, r *Remote, dst string) error {
 
 	// process the layers in order
 	digests := make([]string, len(results))
+	dirmodes := make(map[string]os.FileMode)
+
 	for i := range results {
 		result := <-results[i]
 
@@ -181,13 +183,18 @@ func (s *Store) Extract(ctx context.Context, r *Remote, dst string) error {
 			return fmt.Errorf("error downloading %s: %v", result.Digest, result.Error)
 		}
 
-		err := untarLayer(ctx, result.Path, dst)
+		err := untarLayer(ctx, result.Path, dst, dirmodes)
 
 		if err != nil {
 			return fmt.Errorf("error extracting %s: %v", result.Path, err)
 		}
 
 		digests[i] = result.Digest
+	}
+
+	// set the correct permissions for all directories
+	if err := setDirectoryPermissions(dirmodes); err != nil {
+		return fmt.Errorf("error setting directory permissions: %v", err)
 	}
 
 	// record the destination in the cache

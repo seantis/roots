@@ -11,9 +11,8 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
-
-	"github.com/codeclysm/extract"
 )
 
 // detect relative paths that try to escape the destination directory
@@ -25,7 +24,7 @@ type walkHandler func(*tar.Header, *tar.Reader) error
 // untarLayer takes an OCI layer and extracts it into a directory, observing
 // any whiteouts that might be specified in the layer.
 // See: https://github.com/opencontainers/image-spec/blob/master/layer.md
-func untarLayer(ctx context.Context, archive, dst string) error {
+func untarLayer(ctx context.Context, archive, dst string, dirmodes map[string]os.FileMode) error {
 	r, err := os.Open(archive)
 	if err == nil {
 		defer r.Close()
@@ -38,6 +37,11 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 		defer gzr.Close()
 	} else {
 		return err
+	}
+
+	reset := func() {
+		r.Seek(0, 0)
+		gzr.Reset(r)
 	}
 
 	// pre-process the archive
@@ -55,6 +59,18 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 			return fmt.Errorf("refusing to extract unsafe path: %s", h.Name)
 		}
 
+		// create directory structure
+		if h.Typeflag == tar.TypeDir {
+			file := filepath.Join(dst, h.Name)
+
+			if err := os.MkdirAll(file, 0755); err != nil {
+				return fmt.Errorf("error creating directory %s: %v", file, err)
+			}
+
+			// store actual file mode of directories to set them later
+			dirmodes[file] = os.FileMode(h.Mode)
+		}
+
 		return nil
 	})
 
@@ -62,25 +78,88 @@ func untarLayer(ctx context.Context, archive, dst string) error {
 		return err
 	}
 
-	// then extract all non-whiteout files
-	r.Seek(0, 0)
-	gzr.Reset(r)
+	reset()
 
-	err = extract.Tar(ctx, gzr, dst, func(name string) string {
+	// create all regular files
+	err = walkTar(ctx, gzr, func(h *tar.Header, r *tar.Reader) error {
 
-		// skip whiteout files
-		if isWhiteoutPath(name) {
-			return ""
+		// skip anything but regular files
+		if h.Typeflag != tar.TypeReg {
+			return nil
 		}
 
-		return name
+		// skip whiteout files
+		if isWhiteoutPath(h.Name) {
+			return nil
+		}
+
+		// remove the file if it exists
+		file := filepath.Join(dst, h.Name)
+
+		if info, err := os.Stat(file); err == nil && !info.IsDir() {
+			if err := os.Remove(file); err != nil {
+				return fmt.Errorf("error replacing %s: %v", file, err)
+			}
+		}
+
+		// copy the file
+		f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
+		if err != nil {
+			return fmt.Errorf("error creating %s: %v", file, err)
+		}
+
+		if _, err := io.Copy(f, r); err != nil {
+			return fmt.Errorf("error copying %s: %v", file, err)
+		}
+
+		return f.Close()
 	})
 
 	if err != nil {
 		return err
 	}
 
-	return nil
+	reset()
+
+	// create links
+	return walkTar(ctx, gzr, func(h *tar.Header, r *tar.Reader) error {
+
+		// skip anything that isn't a link
+		if h.Typeflag != tar.TypeLink && h.Typeflag != tar.TypeSymlink {
+			return nil
+		}
+
+		new := filepath.Join(dst, h.Name)
+
+		var old string
+		if h.Linkname[0] == '.' || !strings.Contains(h.Linkname, "/") {
+			old = filepath.Join(filepath.Dir(new), h.Linkname)
+		} else {
+			old = filepath.Join(dst, h.Linkname)
+		}
+
+		// remove the link if it exists
+		if info, err := os.Lstat(new); err == nil && !info.IsDir() {
+			if err := os.Remove(new); err != nil {
+				return fmt.Errorf("error replacing %s: %v", new, err)
+			}
+		}
+
+		// create hard links
+		if h.Typeflag == tar.TypeLink {
+			if err := os.Link(old, new); err != nil {
+				return fmt.Errorf("error creating hard link %s->%s: %v", new, old, err)
+			}
+			return nil
+		}
+
+		// create symbolic links
+		if err := os.Symlink(h.Linkname, new); err != nil {
+			return fmt.Errorf("error creating symbolic link %s->%s: %v", new, old, err)
+		}
+
+		return nil
+	})
 }
 
 // walkTar takes a gzip.Reader and calls a handler function
@@ -108,6 +187,41 @@ func walkTar(ctx context.Context, gzr *gzip.Reader, handler walkHandler) error {
 			}
 		}
 	}
+}
+
+// setDirectoryPermissions takes a list of directories with file permissions
+// and applies the permissions to those files
+func setDirectoryPermissions(dirmodes map[string]os.FileMode) error {
+
+	// process directories with longer paths first, to set the permissions
+	// of children before setting the permissions of parents
+	order := make([]string, 0, len(dirmodes))
+	for path := range dirmodes {
+
+		// it's possible that certain paths do not exist anymore, if a
+		// whiteout was applied in the process
+		if info, err := os.Stat(path); os.IsNotExist(err) {
+			continue
+		} else if err != nil {
+			return fmt.Errorf("error accessing %s: %v", path, err)
+		} else if !info.IsDir() {
+			return fmt.Errorf("not a directory: %s", path)
+		}
+
+		order = append(order, path)
+	}
+
+	sort.Slice(order, func(j, k int) bool {
+		return len(order[j]) > len(order[k])
+	})
+
+	for _, path := range order {
+		if err := os.Chmod(path, dirmodes[path]); err != nil {
+			return fmt.Errorf("error setting %04o on %s: %v", dirmodes[path], path, err)
+		}
+	}
+
+	return nil
 }
 
 // applyWhiteout takes a destination and a relative whiteout path and applies it
