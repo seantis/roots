@@ -19,7 +19,7 @@ type Provider interface {
 	// It is called once for each new url. It is up to the provider to reuse
 	// clients when called multiple times as this depends on the registry.
 	//
-	// The 'auth' paramter is an optional string used for authentication. Its
+	// The 'auth' parameter is an optional string used for authentication. Its
 	// meaning is determined by the provider itself. It may be a path, a token
 	// a username and password etc. - The cli passes the auth value as is.
 	GetClient(url URL, auth string) (*http.Client, error)
