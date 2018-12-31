@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -8,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/seantis/roots/pkg/image"
-	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
 
@@ -72,5 +72,5 @@ func (p *GCRProvider) newClient(auth string) (*http.Client, error) {
 		return nil, fmt.Errorf("error authenticating with %s: %v", gcrscope, err)
 	}
 
-	return conf.Client(oauth2.NoContext), nil
+	return conf.Client(context.Background()), nil
 }
