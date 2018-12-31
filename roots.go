@@ -164,7 +164,10 @@ func main() {
 		}
 	})
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatalf("error running command: %v", err)
+	}
 }
 
 func defaultCache() string {

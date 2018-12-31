@@ -40,8 +40,13 @@ func untarLayer(ctx context.Context, archive, dst string, dirmodes map[string]os
 	}
 
 	reset := func() {
-		r.Seek(0, 0)
-		gzr.Reset(r)
+		if _, err := r.Seek(0, 0); err != nil {
+			panic(fmt.Errorf("failed to seek %s: %v", archive, err))
+		}
+
+		if err := gzr.Reset(r); err != nil {
+			panic(fmt.Errorf("failed to reset %s: %v", archive, err))
+		}
 	}
 
 	// pre-process the archive
@@ -266,7 +271,9 @@ func applyOpaqueWhiteout(dst, whiteout string) error {
 				}
 			}
 
-			err = os.Remove(file)
+			if err := os.Remove(file); err != nil && !os.IsNotExist(err) {
+				return err
+			}
 		}
 	}
 }

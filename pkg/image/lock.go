@@ -44,11 +44,17 @@ func (l *InterProcessLock) Lock() {
 		panic(fmt.Errorf("could not acquire lock: %v", err))
 	}
 
-	l.flock.Lock()
+	err = l.flock.Lock()
+
+	if err != nil {
+		panic(fmt.Errorf("could not acquire file lock: %v", err))
+	}
 }
 
 // Unlock the lock
 func (l *InterProcessLock) Unlock() {
-	l.flock.Unlock()
+	if err := l.flock.Unlock(); err != nil {
+		panic(fmt.Errorf("could not unlock file lock: %v", err))
+	}
 	iplocks[l.Path].Unlock()
 }

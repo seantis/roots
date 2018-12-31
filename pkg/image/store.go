@@ -27,8 +27,10 @@ type StoreResult struct {
 
 // NewStore returns a new store
 func NewStore(folder string) (*Store, error) {
-	os.Mkdir(path.Join(folder, "layers"), 0755)
-	os.Mkdir(path.Join(folder, "links"), 0755)
+
+	// ignore path creation errors - if it's serious, we'll know about it later
+	_ = os.Mkdir(path.Join(folder, "layers"), 0755)
+	_ = os.Mkdir(path.Join(folder, "links"), 0755)
 
 	return &Store{
 		Path: folder,
@@ -258,12 +260,15 @@ func (s *Store) saveLink(dst string, digests []string) error {
 	}
 
 	// the first line is the header
-	f.WriteString(dst)
-	f.WriteString("\n")
+	if _, err := f.WriteString(fmt.Sprintf("%s\n", dst)); err != nil {
+		return fmt.Errorf("error writing %s: %v", file, err)
+	}
 
+	//  the other lines are the digests
 	for _, digest := range digests {
-		f.WriteString(digest)
-		f.WriteString("\n")
+		if _, err := f.WriteString(fmt.Sprintf("%s\n", digest)); err != nil {
+			return fmt.Errorf("error writing %s: %v", file, err)
+		}
 	}
 
 	return nil
