@@ -7,6 +7,8 @@ directly using [systemd-nspawn](https://www.freedesktop.org/software/systemd/man
 There are other tools that can accomplish the same thing, but they all do
 more than roots does. Roots fetches image layers, extracts them and calls it a day.
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/seantis/roots)](https://goreportcard.com/report/github.com/seantis/roots)
+
 ## Introduction
 
 Pull a container, extract it and run it using systemd-nspawn:
