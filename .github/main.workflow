@@ -1,4 +1,4 @@
-workflow "Run Tests and Release if Tagged" {
+workflow "Test & Release" {
   on = "push"
   resolves = "Release"
 }
