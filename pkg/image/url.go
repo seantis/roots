@@ -21,8 +21,8 @@ type URL struct {
 	Digest     string
 }
 
-// String returns the normalised form of the url (i.e the longer form with
-// a guaranteed host, repository and tag name) - if the url is empty, "<empty>"
+// String returns the normalized form of the URL (i.e the longer form with
+// a guaranteed host, repository and tag name) - if the URL is empty, "<empty>"
 // is returned
 func (url URL) String() string {
 	if len(url.Name) == 0 {
@@ -45,7 +45,7 @@ func (url URL) String() string {
 		url.Digest)
 }
 
-// Endpoint returns an API endpoint of the v2 registry api
+// Endpoint returns an API endpoint of the v2 registry API
 func (url URL) Endpoint(segments ...string) string {
 	// by default, no protocol is given and we force https
 	host := fmt.Sprintf("https://%s", url.Host)
@@ -71,7 +71,7 @@ func (url URL) Reference() string {
 	return url.Tag
 }
 
-// Parse parses the given url and returns an error if it doesn't look correct
+// Parse parses the given URL and returns an error if it doesn't look correct
 func Parse(url string) (*URL, error) {
 	url = strings.Trim(url, " \n\t")
 
@@ -89,7 +89,7 @@ func Parse(url string) (*URL, error) {
 	// before the slash is the host and repository, after it the name and tag
 	parts := strings.Split(url, "/")
 
-	// if there is a slash and we got a dot or a colon we found a hostname
+	// if there is a slash and we got a dot or a colon we found a host name
 	if strings.Contains(url, "/") && strings.ContainsAny(parts[0], ".:") {
 		p.Host, parts = parts[0], parts[1:]
 	}

@@ -23,7 +23,7 @@ type PlatformManifest struct {
     Platform Platform `json:"platform"`
 }
 
-// Platform represents the platform descrition in a PlatformManifest
+// Platform represents the platform description in a PlatformManifest
 type Platform struct {
     Architecture string `json:"architecture"`
     OS           string `json:"os"`

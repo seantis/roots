@@ -65,7 +65,7 @@ func (s *Store) Purge() error {
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
 
-			// the first line contains the destionation
+			// the first line contains the destination
 			if dst == "" {
 				dst = scanner.Text()
 				continue
@@ -75,7 +75,7 @@ func (s *Store) Purge() error {
 			links[dst] = append(links[dst], scanner.Text())
 		}
 
-		// manually close instad of deferring, otherwise files are kept open
+		// manually close instead of deferring, otherwise files are kept open
 		// until the function returns
 		f.Close()
 
@@ -134,7 +134,7 @@ func (s *Store) LinkPath(dst string) string {
 	return path.Join(s.Path, "links", fmt.Sprintf("%x.link", md5.Sum([]byte(dst))))
 }
 
-// LayerPath resturns the path to the layer file in the cache
+// LayerPath returns the path to the layer file in the cache
 func (s *Store) LayerPath(digest string) string {
 	return path.Join(s.Path, "layers", fmt.Sprintf("%s.layer", digest))
 }
