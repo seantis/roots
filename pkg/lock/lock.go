@@ -1,3 +1,5 @@
+// Package lock provides interprocess locking using a combination of flock
+// and process-local mutex-es
 package lock
 
 import (
