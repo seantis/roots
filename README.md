@@ -9,7 +9,7 @@ more than roots does. Roots fetches image layers, extracts them and calls it a d
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/seantis/roots)](https://goreportcard.com/report/github.com/seantis/roots)
 
-## Introduction
+## Container Pull
 
 Pull a container, extract it and run it using systemd-nspawn:
 
@@ -24,6 +24,8 @@ Existing directories can be overwritten using `--force`:
 roots pull ubuntu:18.04 ./ubuntu --force
 ```
 
+## Container Digest
+
 Roots supports checking the digest of images, which is useful to check if
 an image has had an update:
 
@@ -31,11 +33,15 @@ an image has had an update:
 roots digest ubuntu:18.04
 ```
 
+## Cache Purge
+
 Roots keeps downloaded layers in a cache. This cache can be purged periodically:
 
 ```bash
 roots purge
 ```
+
+## Private Registries
 
 Private registries are supported, though currently only the Google Container
 Registry has been implemented (pull requests welcome!):
@@ -43,6 +49,8 @@ Registry has been implemented (pull requests welcome!):
 ```bash
 roots pull gcr.io/google-containers/etcd:3.3.10 ./etcd --auth account.json
 ```
+
+## Multi-Arch
 
 It is possible to select a specific architecture/os for the image if it supports
 multi-arch manifests (a.k.a fat manifests):
