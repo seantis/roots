@@ -10,6 +10,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/seantis/roots/pkg/lock"
 )
 
 // Store negotiates between the local destination and the remote image,
@@ -41,7 +43,7 @@ func NewStore(folder string) (*Store, error) {
 func (s *Store) Purge() error {
 
 	// lock the whole cache
-	defer s.lockCache().Unlock()
+	defer s.lockCache().MustUnlock()
 
 	// read the links
 	links := make(map[string][]string)
@@ -151,8 +153,8 @@ func (s *Store) Extract(ctx context.Context, r *Remote, dst string) error {
 	}
 
 	// lock the whole destination as well as the cache
-	defer s.lockCache().Unlock()
-	defer s.lockDestination(dst).Unlock()
+	defer s.lockCache().MustUnlock()
+	defer s.lockDestination(dst).MustUnlock()
 
 	// ensure the destination is empty
 	entries, err := ioutil.ReadDir(dst)
@@ -274,16 +276,16 @@ func (s *Store) saveLink(dst string, digests []string) error {
 	return nil
 }
 
-func (s *Store) lockCache() *InterProcessLock {
-	l := &InterProcessLock{Path: path.Join(s.Path, ".lock")}
-	l.Lock()
+func (s *Store) lockCache() *lock.InterProcessLock {
+	l := &lock.InterProcessLock{Path: path.Join(s.Path, ".lock")}
+	l.MustLock()
 
 	return l
 }
 
-func (s *Store) lockDestination(dst string) *InterProcessLock {
-	l := &InterProcessLock{Path: fmt.Sprintf("%s.lock", dst)}
-	l.Lock()
+func (s *Store) lockDestination(dst string) *lock.InterProcessLock {
+	l := &lock.InterProcessLock{Path: fmt.Sprintf("%s.lock", dst)}
+	l.MustLock()
 
 	return l
 }
