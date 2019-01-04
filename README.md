@@ -15,7 +15,7 @@ Pull a container, extract it and run it using systemd-nspawn:
 
 ```bash
 roots pull ubuntu:18.04 ./ubuntu
-sudo systemd-nspawn -D ./ubuntu
+sudo systemd-nspawn -D ./ubuntu /bin/bash
 ```
 
 Existing directories can be overwritten using `--force`:
@@ -131,4 +131,4 @@ You can create a test release using:
 make test-release
 ```
 
-Test releases have the version 0.0.0.
+Test releases have the version `0.0.0`.
