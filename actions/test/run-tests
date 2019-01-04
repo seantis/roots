@@ -32,3 +32,6 @@ echo ""
 echo "🌲 Testing GCR pull"
 go run roots.go pull gcr.io/google-containers/etcd:3.3.10 /tmp/etcd
 echo ""
+
+echo "🌲 Testing Cache Purge"
+go run roots.go purge

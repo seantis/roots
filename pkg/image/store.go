@@ -45,43 +45,10 @@ func (s *Store) Purge() error {
 	// lock the whole cache
 	defer s.lockCache().MustUnlock()
 
-	// read the links
-	links := make(map[string][]string)
-	selector := fmt.Sprintf("%s/links/*.link", s.Path)
-
-	files, err := filepath.Glob(selector)
+	// load the destination folders and the layers connected to them
+	links, err := s.readLinks()
 	if err != nil {
-		return fmt.Errorf("error reading %s: %v", selector, err)
-	}
-
-	for _, file := range files {
-		f, err := os.Open(file)
-		if err != nil {
-			return fmt.Errorf("error reading %s: %v", file, err)
-		}
-
-		var dst string
-
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-
-			// the first line contains the destination
-			if dst == "" {
-				dst = scanner.Text()
-				continue
-			}
-
-			// subsequent lines contain layers
-			links[dst] = append(links[dst], scanner.Text())
-		}
-
-		// manually close instead of deferring, otherwise files are kept open
-		// until the function returns
-		f.Close()
-
-		if err := scanner.Err(); err != nil {
-			return fmt.Errorf("error reading %s: %v", file, err)
-		}
+		return err
 	}
 
 	// keep a list of known layers
@@ -110,7 +77,7 @@ func (s *Store) Purge() error {
 	}
 
 	// go through all the cached layers and remove the unknown ones
-	selector = fmt.Sprintf("%s/layers/*.layer", s.Path)
+	selector := fmt.Sprintf("%s/layers/*.layer", s.Path)
 	cached, err := filepath.Glob(selector)
 	if err != nil {
 		return fmt.Errorf("error reading %s: %v", selector, err)
@@ -274,6 +241,51 @@ func (s *Store) saveLink(dst string, digests []string) error {
 	}
 
 	return nil
+}
+
+// readLinks walks through the stored links and returns a map of the
+// destinations and the digests they're associated with
+func (s *Store) readLinks() (map[string][]string, error) {
+	selector := fmt.Sprintf("%s/links/*.link", s.Path)
+
+	files, err := filepath.Glob(selector)
+	if err != nil {
+		return nil, fmt.Errorf("error reading %s: %v", selector, err)
+	}
+
+	links := make(map[string][]string)
+
+	for _, file := range files {
+		f, err := os.Open(file)
+		if err != nil {
+			return nil, fmt.Errorf("error reading %s: %v", file, err)
+		}
+
+		var dst string
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+
+			// the first line contains the destination
+			if dst == "" {
+				dst = scanner.Text()
+				continue
+			}
+
+			// subsequent lines contain layers
+			links[dst] = append(links[dst], scanner.Text())
+		}
+
+		// manually close instead of deferring, otherwise files are kept open
+		// until the function returns
+		f.Close()
+
+		if err := scanner.Err(); err != nil {
+			return nil, fmt.Errorf("error reading %s: %v", file, err)
+		}
+	}
+
+	return links, nil
 }
 
 func (s *Store) lockCache() *lock.InterProcessLock {
