@@ -33,13 +33,30 @@ an image has had an update:
 roots digest ubuntu:18.04
 ```
 
-## Cache Purge
+## Cache
 
 Roots keeps downloaded layers in a cache. This cache can be purged periodically:
 
 ```bash
 roots purge
 ```
+
+The default cache directory is `/var/cache/roots` for root users or
+`~/.cache/seantis/roots` for any other user. You can override this with the
+cache option:
+
+```bash
+roots pull debian ./debian --cache /tmp/cache
+roots purge --cache /tmp/cache
+```
+
+Or you can disable the cache entirely as follows:
+
+```bash
+roots pull debian ./debian --cache=no
+```
+
+You can also set this value through the `ROOTS_CACHE` environment variable.
 
 ## Private Registries
 
