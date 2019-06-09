@@ -2,9 +2,8 @@ package provider
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"sync"
 
@@ -57,20 +56,20 @@ func (p *GCRProvider) GetClient(url image.URL, auth string) (*http.Client, error
 // newClient spawns a new http client for GCR given the path to an account json
 // file, or an empty string (for anonymous access)
 func (p *GCRProvider) newClient(auth string) (*http.Client, error) {
-	// unauthenticated access
-	if len(auth) == 0 {
-		return &http.Client{}, nil
+
+	// we try to get the Google's default client and fall back on the
+	// unauthenticated client if that doesn't work
+	if len(auth) != 0 {
+		os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", auth)
 	}
 
-	json, err := ioutil.ReadFile(auth)
-	if err != nil {
-		return nil, fmt.Errorf("error reading auth file %s: %v", auth, err)
+	client, err := google.DefaultClient(context.Background(), gcrscope)
+
+	// we got logged in!
+	if err == nil {
+		return client, nil
 	}
 
-	conf, err := google.JWTConfigFromJSON(json, gcrscope)
-	if err != nil {
-		return nil, fmt.Errorf("error authenticating with %s: %v", gcrscope, err)
-	}
-
-	return conf.Client(context.Background()), nil
+	// we are not authenticated
+	return &http.Client{}, nil
 }

@@ -1,7 +1,6 @@
 package image
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -80,7 +79,7 @@ func TestParse(t *testing.T) {
 
 			assert.Equal(t, c.expected, *result, "unexpected url")
 
-			format := fmt.Sprintf("%s", result)
+			format := String(result)
 			assert.Equal(t, format, c.format, "unexpected format")
 		})
 	}
