@@ -79,7 +79,7 @@ func TestParse(t *testing.T) {
 
 			assert.Equal(t, c.expected, *result, "unexpected url")
 
-			format := String(result)
+			format := result.String()
 			assert.Equal(t, format, c.format, "unexpected format")
 		})
 	}
