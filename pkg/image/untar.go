@@ -107,14 +107,21 @@ func untarLayer(ctx context.Context, archive, dst string, dirmodes map[string]os
 			}
 		}
 
-		// copy the file
-		f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, os.FileMode(h.Mode))
+		// write the file, (re-)setting the mode at the end, which is the
+		// only way to make absolutely sure that is set correctly
+		mode := h.FileInfo().Mode()
+
+		f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, mode)
 		if err != nil {
 			return fmt.Errorf("error creating %s: %v", file, err)
 		}
 
 		if _, err := io.Copy(f, r); err != nil {
 			return fmt.Errorf("error copying %s: %v", file, err)
+		}
+
+		if err := os.Chmod(file, mode); err != nil {
+			return fmt.Errorf("error setting mode for %s: %v", file, err)
 		}
 
 		return f.Close()
