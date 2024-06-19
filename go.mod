@@ -12,10 +12,6 @@ require (
 
 require (
 	cloud.google.com/go v0.40.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang/protobuf v1.3.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
 	golang.org/x/net v0.0.0-20190607181551-461777fb6f67 // indirect
 	google.golang.org/appengine v1.6.1 // indirect
 )
