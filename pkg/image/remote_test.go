@@ -38,20 +38,20 @@ func mockServer() *httpmock.Server {
 		Header: header,
 		Body: []byte(`
 			{
-   				"schemaVersion": 2,
-   				"mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
-   				"manifests": [
-      				{
-         				"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
-         				"size": 123,
-         				"digest": "foobar",
-         				"platform": {
-            				"architecture": "amd64",
-            				"os": "linux"
-            			}
-         			}
-         		]
-      		}
+				"schemaVersion": 2,
+				"mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+				"manifests": [
+						{
+							"mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+							"size": 123,
+							"digest": "foobar",
+							"platform": {
+									"architecture": "amd64",
+									"os": "linux"
+								}
+						}
+					]
+				}
 		`),
 	})
 
