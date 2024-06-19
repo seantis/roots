@@ -146,13 +146,13 @@ func (r *Remote) Digest() (string, error) {
 	//
 	// we could be cleverer here by picking the platform or we could let
 	// the user know that he should pick one
-	if r.platform == nil && lst != nil {
+	if r.platform == nil && lst != nil && len(lst.Manifests) != 0 {
 		return lst.Manifests[0].Digest, nil
 	}
 
 	// if there's no list and no platform, fall back to whatever the server
 	// gives us through the docker-content-digest header
-	if r.platform == nil && lst == nil {
+	if r.platform == nil && (lst == nil || len(lst.Manifests) == 0) {
 		res, err := r.request("HEAD", ManifestMimeType, "manifests", r.url.Reference())
 
 		if err != nil {

@@ -33,5 +33,9 @@ echo "🌲 Testing GCR pull"
 go run roots.go pull gcr.io/google-containers/etcd:3.3.10 /tmp/etcd
 echo ""
 
+echo "🌲 Testing GHCR pull"
+go run roots.go pull ghcr.io/github/issue_metrics:latest /tmp/issue_metrics
+echo ""
+
 echo "🌲 Testing Cache Purge"
 go run roots.go purge
