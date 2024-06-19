@@ -15,7 +15,7 @@ go mod download
 
 # install go get outside our repository to ignore the mod file
 pushd /
-go get github.com/golangci/golangci-lint/cmd/golangci-lint
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 popd
 
 echo "🌲 Running unit tests"
@@ -26,11 +26,15 @@ echo "🌲 Running golangci-lint"
 golangci-lint run
 
 echo "🌲 Testing Docker Hub pull with race detection"
-go run -race roots.go pull ubuntu /tmp/ubuntu
+go run -race roots.go pull debian /tmp/debian
 echo ""
 
 echo "🌲 Testing GCR pull"
 go run roots.go pull gcr.io/google-containers/etcd:3.3.10 /tmp/etcd
+echo ""
+
+echo "🌲 Testing GHCR pull"
+go run roots.go pull ghcr.io/github/issue_metrics:latest /tmp/issue_metrics
 echo ""
 
 echo "🌲 Testing Cache Purge"
