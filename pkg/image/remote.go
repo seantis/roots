@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -230,7 +229,7 @@ func (r *Remote) request(method string, accept string, segments ...string) (*htt
 }
 
 func (r *Remote) unmarshal(res *http.Response, v interface{}) error {
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 
 	if err != nil {
