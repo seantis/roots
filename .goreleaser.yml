@@ -1,20 +1,19 @@
+version: 2
+
 before:
   hooks:
     - go mod download
 
 builds:
--
-  env:
-    - CGO_ENABLED=1
+  - env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    goarch:
+      - amd64
 
-  goos:
-    - linux
-
-  goarch:
-    - amd64
-
-archive:
-  format: binary
+archives:
+  - format: binary
 
 checksum:
   name_template: 'checksums.txt'
@@ -24,8 +23,7 @@ snapshot:
 
 changelog:
   sort: asc
-
   filters:
     exclude:
-    - '^Document'
-    - typo
+      - '^Document'
+      - typo
