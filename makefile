@@ -10,9 +10,9 @@ test-all:
 .PHONY: test-release
 test-release:
 	@ docker build -t roots-release-action actions/release
-	@ docker run -e "GITHUB_REF=refs/tags/v0.0.0" -v $(PWD):/github/workspace --rm -it roots-release-action run-release --skip-publish --snapshot --rm-dist
+	@ docker run -e "GITHUB_REF=refs/tags/v0.0.0" -v $(PWD):/github/workspace --rm -it roots-release-action run-release  --skip=publish --snapshot --clean
 
 .PHONY: release
 release:
 	@ docker build -t roots-release-action actions/release
-	@ docker run -e GITHUB_TOKEN=$(GITHUB_TOKEN) -e GITHUB_REF=refs/tags/$(VERSION) -v $(PWD):/github/workspace --rm -it roots-release-action run-release --rm-dist
+	@ docker run -e GITHUB_TOKEN=$(GITHUB_TOKEN) -e GITHUB_REF=refs/tags/$(VERSION) -v $(PWD):/github/workspace --rm -it roots-release-action run-release --clean

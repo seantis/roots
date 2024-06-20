@@ -14,14 +14,14 @@ more than roots does. Roots fetches image layers, extracts them and calls it a d
 Pull a container, extract it and run it using systemd-nspawn:
 
 ```bash
-roots pull ubuntu:18.04 ./ubuntu
-sudo systemd-nspawn -D ./ubuntu /bin/bash
+roots pull debian:bookworm ./debian
+sudo systemd-nspawn -D ./debian /bin/bash
 ```
 
 Existing directories can be overwritten using `--force`:
 
 ```bash
-roots pull ubuntu:18.04 ./ubuntu --force
+roots pull debian:bookworm ./debian --force
 ```
 
 ## Container Digest
@@ -30,7 +30,7 @@ Roots supports checking the digest of images, which is useful to check if
 an image has had an update:
 
 ```bash
-roots digest ubuntu:18.04
+roots digest debian:bookworm
 ```
 
 ## Cache
@@ -89,7 +89,7 @@ Roots has only been tested on Linux/MacOS.
 To install the roots command-line run the following command:
 
 ```bash
-go get github.com/seantis/roots
+go install github.com/seantis/roots@latest
 ```
 
 ## Multiple Processes
@@ -136,9 +136,9 @@ In the future this step should happen automatically if the tests pass, with
 the only requirement being a tagged commit.
 
 Note also that currently only linux/amd64 is offered as a prebuilt binary. Due
-to our use of the os/user.Current we need to use CGO, which makes cross compilation
-a bit tricky. Other platforms are currently required to install this tool
-using the default `go get github.com/seantis/roots` approach.
+to our use of the os/user. Currently we need to use CGO, which makes cross
+compilation a bit tricky. Other platforms are currently required to install this
+tool using the default `go install github.com/seantis/roots@latest` approach.
 
 ## Test-Releases
 
