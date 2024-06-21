@@ -132,6 +132,9 @@ git push --tags
 GITHUB_TOKEN="foobar" VERSION=vX.Y.Z make release
 ```
 
+GITHUB_TOKEN is a [personal access token (classic)](https://github.com/settings/tokens)
+with `repo` scope.
+
 In the future this step should happen automatically if the tests pass, with
 the only requirement being a tagged commit.
 
