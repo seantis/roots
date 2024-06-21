@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -62,7 +61,7 @@ func main() {
 				*cache = defaultCache()
 			}
 
-			entries, err := ioutil.ReadDir(*cache)
+			entries, err := os.ReadDir(*cache)
 			if err != nil {
 				log.Fatalf("error accessing %s: %v", *cache, err)
 			}
@@ -115,7 +114,7 @@ func main() {
 			}
 
 			if strings.ToLower(*cache) == "no" {
-				temp, err := ioutil.TempDir("", "store")
+				temp, err := os.MkdirTemp("", "store")
 				if err != nil {
 					log.Fatal(err)
 				}
