@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -124,7 +123,7 @@ func (s *Store) Extract(ctx context.Context, r *Remote, dst string) error {
 	defer s.lockDestination(dst).MustUnlock()
 
 	// ensure the destination is empty
-	entries, err := ioutil.ReadDir(dst)
+	entries, err := os.ReadDir(dst)
 	if err != nil {
 		return fmt.Errorf("error extracting to %s: %v", dst, err)
 	}

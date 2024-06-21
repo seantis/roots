@@ -1,21 +1,20 @@
 module github.com/seantis/roots
 
-go 1.17
+go 1.22
 
 require (
-	github.com/alexflint/go-filemutex v0.0.0-20171028004239-d358565f3c3f
-	github.com/dankinder/httpmock v1.0.1
-	github.com/jawher/mow.cli v1.1.0
-	github.com/stretchr/testify v1.3.0
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	github.com/alexflint/go-filemutex v1.3.0
+	github.com/dankinder/httpmock v1.0.4
+	github.com/jawher/mow.cli v1.2.0
+	github.com/stretchr/testify v1.9.0
+	golang.org/x/oauth2 v0.21.0
 )
 
 require (
-	cloud.google.com/go v0.40.0 // indirect
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
-	golang.org/x/net v0.0.0-20190607181551-461777fb6f67 // indirect
-	google.golang.org/appengine v1.6.1 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

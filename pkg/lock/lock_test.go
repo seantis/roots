@@ -1,7 +1,7 @@
 package lock
 
 import (
-	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 
@@ -10,7 +10,7 @@ import (
 
 // TestLockSimple tests the interprocess locking using a single process
 func TestLockSimple(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "locks")
+	dir, _ := os.MkdirTemp("", "locks")
 
 	foo := &InterProcessLock{Path: path.Join(dir, "foo")}
 	bar := &InterProcessLock{Path: path.Join(dir, "bar")}
