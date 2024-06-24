@@ -26,6 +26,10 @@ echo ""
 echo "🌲 Running golangci-lint"
 golangci-lint run
 
+echo "🌲 Testing version"
+go run roots.go version
+echo ""
+
 echo "🌲 Testing Docker Hub pull with race detection"
 go run -race roots.go pull debian /tmp/debian
 echo ""

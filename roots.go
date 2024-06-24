@@ -16,12 +16,24 @@ import (
 	_ "github.com/seantis/roots/pkg/provider" // to register providers
 )
 
+var (
+    version = "dev"
+    commit  = "none"
+    date    = "unknown"
+)
+
 func main() {
 	app := cli.App("roots", "Download and extract containers")
 	ctx := newInterruptableContext()
 
 	// disable datetime output
 	log.SetFlags(0)
+
+	app.Command("version", "Show version", func(cmd *cli.Cmd) {
+		cmd.Action = func() {
+			fmt.Printf("roots %s, commit %s, built at %s\n", version, commit, date)
+		}
+	})
 
 	app.Command("digest", "Show the latest digest", func(cmd *cli.Cmd) {
 		cmd.Spec = "CONTAINER [--auth] [--arch] [--os]"
