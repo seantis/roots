@@ -86,7 +86,7 @@ func (r *Remote) WithPlatform(p *Platform) {
 func (r *Remote) ManifestList() (*ManifestList, error) {
 
 	// not having a manifest list is no error
-	res, err := r.request("GET", ManifestListMimeType, "manifests", r.url.Reference())
+	res, err := r.request("GET", AcceptManifestList, "manifests", r.url.Reference())
 	if err != nil {
 		return nil, nil
 	}
@@ -111,14 +111,15 @@ func (r *Remote) Manifest() (*Manifest, error) {
 	}
 
 	// it should almost certainly be fetchable at this point
-	res, err := r.request("GET", ManifestMimeType, "manifests", digest)
+	res, err := r.request("GET", AcceptManifest, "manifests", digest)
 	if err != nil {
 		return nil, fmt.Errorf("error requesting manifest@%s: %v", digest, err)
 	}
 
-	// if the server responds with a manifest list, our digest is not correct
-	if res.Header.Get("Content-Type") != ManifestMimeType {
-		return nil, fmt.Errorf("content type for %s cannot be %s", digest, res.Header.Get("Content-Type"))
+	// if the server responds with a manifest list/index, our digest is not correct
+	ct := res.Header.Get("Content-Type")
+	if ct != ManifestMimeType && ct != OCIManifestMimeType {
+		return nil, fmt.Errorf("content type for %s cannot be %s", digest, ct)
 	}
 
 	// we must also be able to parse it
@@ -152,7 +153,7 @@ func (r *Remote) Digest() (string, error) {
 	// if there's no list and no platform, fall back to whatever the server
 	// gives us through the docker-content-digest header
 	if r.platform == nil && (lst == nil || len(lst.Manifests) == 0) {
-		res, err := r.request("HEAD", ManifestMimeType, "manifests", r.url.Reference())
+		res, err := r.request("HEAD", AcceptManifest, "manifests", r.url.Reference())
 
 		if err != nil {
 			return "", fmt.Errorf("failed to fetch manifest: %v", err)

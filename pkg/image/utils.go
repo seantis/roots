@@ -26,7 +26,7 @@ func requireSupportedMimeTypes(client *http.Client, url URL) error {
 	ref := url.Endpoint("manifests", url.Reference())
 
 	req := mustNewRequest("HEAD", ref)
-	req.Header.Add("Accept", fmt.Sprintf("%s, */*", ManifestMimeType))
+	req.Header.Add("Accept", AcceptManifest+", "+AcceptManifestList+", */*")
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -37,9 +37,17 @@ func requireSupportedMimeTypes(client *http.Client, url URL) error {
 	}
 
 	mime := res.Header.Get("Content-Type")
-	if mime != ManifestMimeType && mime != ManifestListMimeType {
-		return fmt.Errorf("no schema version 2 support by %s", url)
+	if !isSupportedMimeType(mime) {
+		return fmt.Errorf("unsupported manifest type %s from %s", mime, url)
 	}
 
 	return nil
+}
+
+func isSupportedMimeType(mime string) bool {
+	switch mime {
+	case ManifestMimeType, ManifestListMimeType, OCIManifestMimeType, OCIIndexMimeType:
+		return true
+	}
+	return false
 }
