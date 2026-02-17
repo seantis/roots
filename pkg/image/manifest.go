@@ -3,11 +3,23 @@ package image
 import "fmt"
 
 var (
-	// ManifestListMimeType is the mime type used to get the manifest list
+	// ManifestListMimeType is the mime type used to get the manifest list (Docker)
 	ManifestListMimeType = "application/vnd.docker.distribution.manifest.list.v2+json"
 
-	// ManifestMimeType is the mime type used to get the manifest
+	// ManifestMimeType is the mime type used to get the manifest (Docker)
 	ManifestMimeType = "application/vnd.docker.distribution.manifest.v2+json"
+
+	// OCIIndexMimeType is the mime type for OCI image indexes (multi-arch)
+	OCIIndexMimeType = "application/vnd.oci.image.index.v1+json"
+
+	// OCIManifestMimeType is the mime type for OCI image manifests
+	OCIManifestMimeType = "application/vnd.oci.image.manifest.v1+json"
+
+	// AcceptManifestList is the Accept header value for manifest list requests
+	AcceptManifestList = ManifestListMimeType + ", " + OCIIndexMimeType
+
+	// AcceptManifest is the Accept header value for manifest requests
+	AcceptManifest = ManifestMimeType + ", " + OCIManifestMimeType
 )
 
 // ManifestList represents the Docker Manifest List:
